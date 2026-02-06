@@ -1,1 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiener Dog Calorie Counter</title>
+    <style>
+        :root {
+            /* New Color Palette */
+            --primary: #008080;   /* Teal */
+            --primary-dark: #006666; 
+            --secondary: #800080; /* Purple */
+            --secondary-light: #f3e5f5;
+            --bg: #e0f2f1;        /* Very light teal background */
+            --text: #333;
+            --white: #fff;
+            --danger: #d32f2f;
+            --success: #008080;   /* Teal for success/add button */
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .app-container {
+            background: var(--white);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid var(--primary);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .date-display {
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-card {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .calories-big {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--secondary); /* Purple numbers */
+            line-height: 1;
+        }
+
+        .calories-label {
+            color: var(--primary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .over-limit {
+            color: var(--danger);
+        }
+
+        .input-section {
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+
+        button.add-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button.add-btn:hover {
+            opacity: 0.9;
+        }
+
+        .log-section {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--white);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-light);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+        }
+
+        .manual-reset-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 0.75rem;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            animation: fadeIn 0.3s ease;
+        }
+
+        li:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .food-info strong {
+            display: block;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .food-info span {
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+
+        .calorie-badge {
+            background: var(--secondary-light);
+            color: var(--secondary);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .delete-item {
+            color: #ccc;
+            margin-left: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            background: none;
+        }
+        
+        .delete-item:hover {
+            color: var(--danger);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>🌭 Wiener Watch</h1>
+        <div id="dateDisplay" class="date-display">Loading Date...</div>
+    </header>
+
+    <div class="status-card">
+        <div id="caloriesDisplay" class="calories-big">600</div>
+        <div class="calories-label">Calories Remaining</div>
+    </div>
+
+    <div class="input-section">
+        <div class="form-group">
+            <label for="foodName">Food / Treat Type</label>
+            <input type="text" id="foodName" placeholder="e.g. Kibble, Cheese bit">
+        </div>
+        <div class="form-group">
+            <label for="calorieAmount">Calories</label>
+            <input type="number" id="calorieAmount" inputmode="numeric" placeholder="e.g. 50">
+        </div>
+        <button class="add-btn" onclick="addEntry()">Add Entry</button>
+    </div>
+
+    <div class="log-section">
+        <div class="log-header">
+            <h3>Daily Log</h3>
+            <button class="manual-reset-btn" onclick="manualReset()">Force Reset</button>
+        </div>
+        <ul id="logList">
+            </ul>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const DAILY_LIMIT = 600;
+    const STORAGE_KEY = 'wiener_dog_calories_v2';
+    const TIMEZONE = 'America/New_York'; // Eastern Time
+
+    // State
+    let state = {
+        lastRecordedDate: null,
+        entries: []
+    };
+
+    // DOM Elements
+    const displayEl = document.getElementById('caloriesDisplay');
+    const dateDisplayEl = document.getElementById('dateDisplay');
+    const inputNameEl = document.getElementById('foodName');
+    const inputCalEl = document.getElementById('calorieAmount');
+    const listEl = document.getElementById('logList');
+
+    // Helper: Get formatted date string for Eastern Time (e.g., "10/24/2023")
+    function getEasternDateString() {
+        return new Date().toLocaleDateString('en-US', {
+            timeZone: TIMEZONE,
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric'
+        });
+    }
+
+    // Helper: Get readable date for display (e.g., "Tue, Oct 24")
+    function getDisplayDateString() {
+        return new Date().toLocaleDateString('en-US', {
+            timeZone: TIMEZONE,
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    // Initialize App
+    function init() {
+        loadData();
+        checkDayReset(); // Check if day changed since last visit
+        render();
+    }
+
+    // Check if we need to reset for a new day
+    function checkDayReset() {
+        const today = getEasternDateString();
+        
+        // Update the visual date display
+        dateDisplayEl.innerText = getDisplayDateString();
+
+        // If stored date is different from today (Eastern Time), reset
+        if (state.lastRecordedDate !== today) {
+            console.log("New day detected (Eastern Time). Resetting log.");
+            state.entries = [];
+            state.lastRecordedDate = today;
+            saveData();
+        }
+    }
+
+    // Add a new food entry
+    function addEntry() {
+        // Double check date hasn't rolled over while page was open
+        checkDayReset();
+
+        const name = inputNameEl.value.trim();
+        const calories = parseInt(inputCalEl.value);
+
+        if (!name) {
+            alert("Please enter a food type.");
+            return;
+        }
+        if (isNaN(calories) || calories <= 0) {
+            alert("Please enter a valid number of calories.");
+            return;
+        }
+
+        const entry = {
+            id: Date.now(),
+            name: name,
+            calories: calories,
+            // Store timestamp based on browser time for UI, but logic relies on ET date
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        state.entries.push(entry);
+
+        inputNameEl.value = '';
+        inputCalEl.value = '';
+        inputNameEl.focus(); // Keep focus for easy typing
+
+        saveData();
+        render();
+    }
+
+    // Delete a specific entry
+    function deleteEntry(id) {
+        if(confirm("Remove this item?")) {
+            state.entries = state.entries.filter(entry => entry.id !== id);
+            saveData();
+            render();
+        }
+    }
+
+    // Manual Reset (Force new day)
+    function manualReset() {
+        if(confirm("Force a reset? This will clear all entries for today.")) {
+            state.entries = [];
+            state.lastRecordedDate = getEasternDateString();
+            saveData();
+            render();
+        }
+    }
+
+    // Render UI
+    function render() {
+        // Calculate total
+        const totalConsumed = state.entries.reduce((sum, entry) => sum + entry.calories, 0);
+        const remaining = DAILY_LIMIT - totalConsumed;
+
+        // Update Big Number
+        displayEl.innerText = remaining;
+        
+        // Colors
+        if (remaining < 0) {
+            displayEl.classList.add('over-limit');
+        } else {
+            displayEl.classList.remove('over-limit');
+        }
+
+        // Update List
+        listEl.innerHTML = '';
+        
+        const reversedEntries = [...state.entries].reverse();
+
+        if (reversedEntries.length === 0) {
+            listEl.innerHTML = '<li style="color:#aaa; text-align:center; display:block; padding:20px;">No treats yet today!</li>';
+        } else {
+            reversedEntries.forEach(entry => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="food-info">
+                        <strong>${entry.name}</strong>
+                        <span>${entry.timestamp}</span>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <span class="calorie-badge">${entry.calories}</span>
+                        <button class="delete-item" onclick="deleteEntry(${entry.id})">&times;</button>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadData() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            state = JSON.parse(stored);
+        }
+    }
+
+    // Run startup
+    init();
+
+    // Optional: Check for day change every minute (if app stays open overnight)
+    setInterval(checkDayReset, 60000);
+
+</script>
+
+</body>
+</html>
