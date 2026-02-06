@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiener Dog Calorie Counter</title>
+    <title>Wiener Watch: History Edition</title>
     <style>
         :root {
-            /* New Color Palette */
             --primary: #008080;   /* Teal */
             --primary-dark: #006666; 
             --secondary: #800080; /* Purple */
@@ -15,7 +14,7 @@
             --text: #333;
             --white: #fff;
             --danger: #d32f2f;
-            --success: #008080;   /* Teal for success/add button */
+            --gray-light: #f4f4f4;
         }
 
         body {
@@ -44,23 +43,66 @@
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: var(--white);
-            padding: 20px;
+            padding: 15px 20px;
             text-align: center;
         }
 
         header h1 {
-            margin: 0;
-            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
         }
 
-        .date-display {
+        /* --- Date Controls --- */
+        .date-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.2);
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            padding: 8px;
+            border-radius: 30px;
+        }
+
+        .nav-arrow {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        /* Hide the default date input styling but keep functionality */
+        .date-picker-wrapper {
+            position: relative;
+        }
+
+        input[type="date"] {
+            background: transparent;
+            color: white;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        /* Filter allows us to color the calendar icon in some browsers */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
         }
 
         .status-card {
@@ -73,8 +115,9 @@
         .calories-big {
             font-size: 4rem;
             font-weight: bold;
-            color: var(--secondary); /* Purple numbers */
+            color: var(--secondary);
             line-height: 1;
+            transition: color 0.3s;
         }
 
         .calories-label {
@@ -86,33 +129,34 @@
         }
 
         .over-limit {
-            color: var(--danger);
+            color: var(--danger) !important;
         }
 
         .input-section {
             padding: 20px;
             background: #fafafa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            flex: 1;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--primary-dark);
-        }
-
-        input {
+        input[type="text"], input[type="number"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 1rem;
             box-sizing: border-box;
+            background: white;
+            color: #333;
         }
 
         input:focus {
@@ -122,7 +166,7 @@
 
         button.add-btn {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background-color: var(--secondary);
             color: white;
             border: none;
@@ -139,33 +183,19 @@
 
         .log-section {
             flex-grow: 1;
-            padding: 20px;
+            padding: 0;
             overflow-y: auto;
             background: var(--white);
         }
 
         .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 2px solid var(--secondary-light);
-            padding-bottom: 10px;
-        }
-
-        h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--primary-dark);
-        }
-
-        .manual-reset-btn {
-            background: none;
-            border: none;
-            color: #999;
-            font-size: 0.75rem;
-            text-decoration: underline;
-            cursor: pointer;
+            background: var(--gray-light);
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         ul {
@@ -178,13 +208,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 10px;
+            padding: 12px 20px;
             border-bottom: 1px solid #f0f0f0;
             animation: fadeIn 0.3s ease;
-        }
-
-        li:nth-child(even) {
-            background-color: #fafafa;
         }
 
         .food-info strong {
@@ -215,6 +241,7 @@
             font-size: 1.2rem;
             border: none;
             background: none;
+            padding: 0 5px;
         }
         
         .delete-item:hover {
@@ -232,7 +259,14 @@
 <div class="app-container">
     <header>
         <h1>🌭 Wiener Watch</h1>
-        <div id="dateDisplay" class="date-display">Loading Date...</div>
+        
+        <div class="date-controls">
+            <button class="nav-arrow" onclick="shiftDate(-1)">&lt;</button>
+            <div class="date-picker-wrapper">
+                <input type="date" id="datePicker" onchange="handleDateChange(this.value)">
+            </div>
+            <button class="nav-arrow" onclick="shiftDate(1)">&gt;</button>
+        </div>
     </header>
 
     <div class="status-card">
@@ -241,168 +275,176 @@
     </div>
 
     <div class="input-section">
-        <div class="form-group">
-            <label for="foodName">Food / Treat Type</label>
-            <input type="text" id="foodName" placeholder="e.g. Kibble, Cheese bit">
-        </div>
-        <div class="form-group">
-            <label for="calorieAmount">Calories</label>
-            <input type="number" id="calorieAmount" inputmode="numeric" placeholder="e.g. 50">
+        <div class="form-row">
+            <div class="form-group" style="flex: 2;">
+                <input type="text" id="foodName" placeholder="Food Name">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <input type="number" id="calorieAmount" inputmode="numeric" placeholder="Cals">
+            </div>
         </div>
         <button class="add-btn" onclick="addEntry()">Add Entry</button>
     </div>
 
     <div class="log-section">
-        <div class="log-header">
-            <h3>Daily Log</h3>
-            <button class="manual-reset-btn" onclick="manualReset()">Force Reset</button>
-        </div>
+        <div class="log-header" id="logHeaderDate">Today's Log</div>
         <ul id="logList">
             </ul>
     </div>
 </div>
 
 <script>
-    // Configuration
+    // --- Configuration ---
     const DAILY_LIMIT = 600;
-    const STORAGE_KEY = 'wiener_dog_calories_v2';
-    const TIMEZONE = 'America/New_York'; // Eastern Time
+    const STORAGE_KEY = 'wiener_dog_history_v1';
+    const TIMEZONE = 'America/New_York';
 
-    // State
-    let state = {
-        lastRecordedDate: null,
-        entries: []
-    };
+    // --- State ---
+    // 'history' is an object where keys are date strings ("YYYY-MM-DD")
+    // and values are arrays of entry objects.
+    let historyData = {}; 
+    let currentViewDate = ""; // String "YYYY-MM-DD"
 
-    // DOM Elements
+    // --- DOM Elements ---
     const displayEl = document.getElementById('caloriesDisplay');
-    const dateDisplayEl = document.getElementById('dateDisplay');
+    const datePickerEl = document.getElementById('datePicker');
     const inputNameEl = document.getElementById('foodName');
     const inputCalEl = document.getElementById('calorieAmount');
     const listEl = document.getElementById('logList');
+    const logHeaderEl = document.getElementById('logHeaderDate');
 
-    // Helper: Get formatted date string for Eastern Time (e.g., "10/24/2023")
-    function getEasternDateString() {
-        return new Date().toLocaleDateString('en-US', {
-            timeZone: TIMEZONE,
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric'
-        });
-    }
-
-    // Helper: Get readable date for display (e.g., "Tue, Oct 24")
-    function getDisplayDateString() {
-        return new Date().toLocaleDateString('en-US', {
-            timeZone: TIMEZONE,
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric'
-        });
-    }
-
-    // Initialize App
+    // --- Initialization ---
     function init() {
         loadData();
-        checkDayReset(); // Check if day changed since last visit
+        // Always default to "Today" (Eastern Time) on reload
+        currentViewDate = getTodayDateString();
         render();
     }
 
-    // Check if we need to reset for a new day
-    function checkDayReset() {
-        const today = getEasternDateString();
+    // --- Date Helpers ---
+    
+    // Returns "YYYY-MM-DD" for Today in Eastern Time
+    function getTodayDateString() {
+        const now = new Date();
+        // Use Intl to get the date parts in the correct timezone
+        const options = { timeZone: TIMEZONE, year: 'numeric', month: 'numeric', day: 'numeric' };
+        const formatter = new Intl.DateTimeFormat('en-US', options);
+        const parts = formatter.formatToParts(now);
         
-        // Update the visual date display
-        dateDisplayEl.innerText = getDisplayDateString();
-
-        // If stored date is different from today (Eastern Time), reset
-        if (state.lastRecordedDate !== today) {
-            console.log("New day detected (Eastern Time). Resetting log.");
-            state.entries = [];
-            state.lastRecordedDate = today;
-            saveData();
-        }
+        // Extract parts to build YYYY-MM-DD manually to ensure format consistency
+        const year = parts.find(p => p.type === 'year').value;
+        const month = parts.find(p => p.type === 'month').value.padStart(2, '0');
+        const day = parts.find(p => p.type === 'day').value.padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
     }
 
-    // Add a new food entry
-    function addEntry() {
-        // Double check date hasn't rolled over while page was open
-        checkDayReset();
+    // --- Core Logic ---
 
+    function handleDateChange(newDateVal) {
+        if (!newDateVal) return;
+        currentViewDate = newDateVal;
+        render();
+    }
+
+    function shiftDate(days) {
+        // Create a date object from current view string (treated as UTC to avoid timezone shifts)
+        const parts = currentViewDate.split('-');
+        const dateObj = new Date(Date.UTC(parts[0], parts[1]-1, parts[2]));
+        
+        // Add days
+        dateObj.setUTCDate(dateObj.getUTCDate() + days);
+        
+        // Convert back to YYYY-MM-DD
+        const y = dateObj.getUTCFullYear();
+        const m = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getUTCDate()).padStart(2, '0');
+        
+        currentViewDate = `${y}-${m}-${d}`;
+        render();
+    }
+
+    function addEntry() {
         const name = inputNameEl.value.trim();
         const calories = parseInt(inputCalEl.value);
 
-        if (!name) {
-            alert("Please enter a food type.");
-            return;
-        }
-        if (isNaN(calories) || calories <= 0) {
-            alert("Please enter a valid number of calories.");
-            return;
+        if (!name) { alert("Please enter a food type."); return; }
+        if (isNaN(calories) || calories <= 0) { alert("Please enter valid calories."); return; }
+
+        // Ensure array exists for this day
+        if (!historyData[currentViewDate]) {
+            historyData[currentViewDate] = [];
         }
 
         const entry = {
             id: Date.now(),
             name: name,
             calories: calories,
-            // Store timestamp based on browser time for UI, but logic relies on ET date
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
 
-        state.entries.push(entry);
+        historyData[currentViewDate].push(entry);
 
         inputNameEl.value = '';
         inputCalEl.value = '';
-        inputNameEl.focus(); // Keep focus for easy typing
+        inputNameEl.focus();
 
         saveData();
         render();
     }
 
-    // Delete a specific entry
     function deleteEntry(id) {
-        if(confirm("Remove this item?")) {
-            state.entries = state.entries.filter(entry => entry.id !== id);
+        if(confirm("Delete this entry?")) {
+            const dayEntries = historyData[currentViewDate] || [];
+            historyData[currentViewDate] = dayEntries.filter(e => e.id !== id);
             saveData();
             render();
         }
     }
 
-    // Manual Reset (Force new day)
-    function manualReset() {
-        if(confirm("Force a reset? This will clear all entries for today.")) {
-            state.entries = [];
-            state.lastRecordedDate = getEasternDateString();
-            saveData();
-            render();
-        }
-    }
+    // --- UI Rendering ---
 
-    // Render UI
     function render() {
-        // Calculate total
-        const totalConsumed = state.entries.reduce((sum, entry) => sum + entry.calories, 0);
+        // 1. Update Date Picker UI
+        datePickerEl.value = currentViewDate;
+
+        // 2. Get Data for selected day
+        const dayEntries = historyData[currentViewDate] || [];
+
+        // 3. Calculate Total
+        const totalConsumed = dayEntries.reduce((sum, entry) => sum + entry.calories, 0);
         const remaining = DAILY_LIMIT - totalConsumed;
 
-        // Update Big Number
+        // 4. Update Header Status
         displayEl.innerText = remaining;
-        
-        // Colors
         if (remaining < 0) {
             displayEl.classList.add('over-limit');
         } else {
             displayEl.classList.remove('over-limit');
         }
 
-        // Update List
+        // 5. Update Log Header Text
+        const todayStr = getTodayDateString();
+        if (currentViewDate === todayStr) {
+            logHeaderEl.innerText = "Today's Log";
+        } else {
+            // Format readable date like "Oct 27, 2023"
+            const dateObj = new Date(currentViewDate + 'T12:00:00'); // append time to prevent TZ shift
+            const readable = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
+            logHeaderEl.innerText = `Log for ${readable}`;
+        }
+
+        // 6. Render List
         listEl.innerHTML = '';
         
-        const reversedEntries = [...state.entries].reverse();
-
-        if (reversedEntries.length === 0) {
-            listEl.innerHTML = '<li style="color:#aaa; text-align:center; display:block; padding:20px;">No treats yet today!</li>';
+        if (dayEntries.length === 0) {
+            listEl.innerHTML = `
+                <li style="justify-content:center; color:#999; padding:30px 0;">
+                    No entries for this date.
+                </li>`;
         } else {
-            reversedEntries.forEach(entry => {
+            // Show newest first
+            [...dayEntries].reverse().forEach(entry => {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div class="food-info">
@@ -419,22 +461,21 @@
         }
     }
 
+    // --- Storage ---
+
     function saveData() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(historyData));
     }
 
     function loadData() {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            state = JSON.parse(stored);
+            historyData = JSON.parse(stored);
         }
     }
 
-    // Run startup
+    // Start
     init();
-
-    // Optional: Check for day change every minute (if app stays open overnight)
-    setInterval(checkDayReset, 60000);
 
 </script>
 
