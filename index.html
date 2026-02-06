@@ -3,254 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiener Watch: History Edition</title>
+    <title>Wiener Watch: Deluxe Tracker</title>
     <style>
         :root {
             --primary: #008080;   /* Teal */
-            --primary-dark: #006666; 
             --secondary: #800080; /* Purple */
-            --secondary-light: #f3e5f5;
-            --bg: #e0f2f1;        /* Very light teal background */
-            --text: #333;
+            --bg: #e0f2f1;
             --white: #fff;
             --danger: #d32f2f;
-            --gray-light: #f4f4f4;
+            --gray: #f4f4f4;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
             margin: 0;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .app-container {
             background: var(--white);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
             border: 2px solid var(--primary);
         }
 
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: var(--white);
-            padding: 15px 20px;
+            padding: 20px;
             text-align: center;
         }
 
-        header h1 {
-            margin: 0 0 10px 0;
-            font-size: 1.4rem;
-        }
-
-        /* --- Date Controls --- */
-        .date-controls {
+        .date-nav {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px;
-            border-radius: 30px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
-        .nav-arrow {
-            background: rgba(255,255,255,0.3);
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
             font-size: 1.2rem;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .nav-arrow:hover {
-            background: rgba(255,255,255,0.5);
-        }
-
-        /* Hide the default date input styling but keep functionality */
-        .date-picker-wrapper {
-            position: relative;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
         }
 
         input[type="date"] {
             background: transparent;
             color: white;
-            border: none;
-            font-family: inherit;
-            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 5px;
+            border-radius: 5px;
             font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            outline: none;
-        }
-        
-        /* Filter allows us to color the calendar icon in some browsers */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
         }
 
         .status-card {
-            background: #fff;
-            padding: 20px;
             text-align: center;
+            padding: 20px;
             border-bottom: 1px solid #eee;
         }
 
         .calories-big {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: bold;
             color: var(--secondary);
-            line-height: 1;
-            transition: color 0.3s;
+            margin: 0;
         }
 
-        .calories-label {
-            color: var(--primary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-
-        .over-limit {
-            color: var(--danger) !important;
-        }
+        .over-limit { color: var(--danger); }
 
         .input-section {
             padding: 20px;
-            background: #fafafa;
-            border-bottom: 1px solid #eee;
-        }
-
-        .form-row {
+            background: var(--gray);
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            margin-bottom: 10px;
         }
 
-        .form-group {
-            flex: 1;
-        }
+        .row { display: flex; gap: 10px; }
 
         input[type="text"], input[type="number"] {
-            width: 100%;
             padding: 12px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            background: white;
-            color: #333;
+            flex: 1;
         }
 
-        input:focus {
-            border-color: var(--secondary);
-            outline: none;
-        }
-
-        button.add-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--secondary);
+        .add-btn {
+            background: var(--primary);
             color: white;
             border: none;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: opacity 0.2s;
         }
 
-        button.add-btn:hover {
-            opacity: 0.9;
-        }
+        .log-section { padding: 20px; max-height: 300px; overflow-y: auto; }
 
-        .log-section {
-            flex-grow: 1;
-            padding: 0;
-            overflow-y: auto;
-            background: var(--white);
-        }
-
-        .log-header {
-            background: var(--gray-light);
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            color: #666;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        ul { list-style: none; padding: 0; margin: 0; }
 
         li {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .food-info strong {
-            display: block;
-            font-size: 1rem;
-            color: #333;
-        }
-
-        .food-info span {
-            font-size: 0.8rem;
-            color: var(--primary);
-        }
-
-        .calorie-badge {
-            background: var(--secondary-light);
-            color: var(--secondary);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
         }
 
         .delete-item {
             color: #ccc;
-            margin-left: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.2rem;
-            border: none;
             background: none;
-            padding: 0 5px;
-        }
-        
-        .delete-item:hover {
-            color: var(--danger);
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .delete-item:hover { color: var(--danger); }
+
+        /* Summary Chart Styling */
+        .summary-section {
+            padding: 20px;
+            background: #fff;
+            border-top: 2px solid var(--secondary);
+        }
+
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 100px;
+            margin-top: 15px;
+            padding-top: 20px;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .bar {
+            width: 20px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s ease;
+        }
+
+        .bar-label { font-size: 0.7rem; color: #666; margin-top: 5px; }
+        
+        .limit-line {
+            border-top: 1px dashed var(--danger);
+            width: 100%;
+            position: relative;
+            height: 0;
+            top: -60px; /* Simulated 600 line */
         }
     </style>
 </head>
@@ -259,224 +178,135 @@
 <div class="app-container">
     <header>
         <h1>🌭 Wiener Watch</h1>
-        
-        <div class="date-controls">
-            <button class="nav-arrow" onclick="shiftDate(-1)">&lt;</button>
-            <div class="date-picker-wrapper">
-                <input type="date" id="datePicker" onchange="handleDateChange(this.value)">
-            </div>
-            <button class="nav-arrow" onclick="shiftDate(1)">&gt;</button>
+        <div class="date-nav">
+            <button class="nav-btn" onclick="shiftDate(-1)">❮</button>
+            <input type="date" id="datePicker" onchange="setDate(this.value)">
+            <button class="nav-btn" onclick="shiftDate(1)">❯</button>
         </div>
     </header>
 
     <div class="status-card">
-        <div id="caloriesDisplay" class="calories-big">600</div>
-        <div class="calories-label">Calories Remaining</div>
+        <p style="margin:0; color: var(--primary); font-weight:bold;">REMAINING</p>
+        <h2 id="calDisplay" class="calories-big">600</h2>
     </div>
 
     <div class="input-section">
-        <div class="form-row">
-            <div class="form-group" style="flex: 2;">
-                <input type="text" id="foodName" placeholder="Food Name">
-            </div>
-            <div class="form-group" style="flex: 1;">
-                <input type="number" id="calorieAmount" inputmode="numeric" placeholder="Cals">
-            </div>
+        <div class="row">
+            <input type="text" id="foodName" placeholder="Treat Type (e.g. Cheese)">
+            <input type="number" id="foodCals" placeholder="Cals" style="max-width: 80px;">
         </div>
-        <button class="add-btn" onclick="addEntry()">Add Entry</button>
+        <button class="add-btn" onclick="addEntry()">Add Food</button>
     </div>
 
     <div class="log-section">
-        <div class="log-header" id="logHeaderDate">Today's Log</div>
-        <ul id="logList">
-            </ul>
+        <h3 id="logTitle" style="color: var(--secondary); margin-top:0;">Today's Log</h3>
+        <ul id="logList"></ul>
+    </div>
+
+    <div class="summary-section">
+        <h3 style="margin:0; font-size: 1rem; color: var(--primary);">7-Day Trend</h3>
+        <div class="chart-container" id="chart"></div>
     </div>
 </div>
 
 <script>
-    // --- Configuration ---
     const DAILY_LIMIT = 600;
-    const STORAGE_KEY = 'wiener_dog_history_v1';
-    const TIMEZONE = 'America/New_York';
+    const STORAGE_KEY = 'wiener_dog_v3_data';
+    const TZ = 'America/New_York';
 
-    // --- State ---
-    // 'history' is an object where keys are date strings ("YYYY-MM-DD")
-    // and values are arrays of entry objects.
-    let historyData = {}; 
-    let currentViewDate = ""; // String "YYYY-MM-DD"
+    let history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    let viewDate = getTodayET();
 
-    // --- DOM Elements ---
-    const displayEl = document.getElementById('caloriesDisplay');
-    const datePickerEl = document.getElementById('datePicker');
-    const inputNameEl = document.getElementById('foodName');
-    const inputCalEl = document.getElementById('calorieAmount');
-    const listEl = document.getElementById('logList');
-    const logHeaderEl = document.getElementById('logHeaderDate');
+    // --- Date Logic ---
+    function getTodayET() {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date()); 
+    }
 
-    // --- Initialization ---
-    function init() {
-        loadData();
-        // Always default to "Today" (Eastern Time) on reload
-        currentViewDate = getTodayDateString();
+    function setDate(val) {
+        viewDate = val;
         render();
     }
 
-    // --- Date Helpers ---
-    
-    // Returns "YYYY-MM-DD" for Today in Eastern Time
-    function getTodayDateString() {
-        const now = new Date();
-        // Use Intl to get the date parts in the correct timezone
-        const options = { timeZone: TIMEZONE, year: 'numeric', month: 'numeric', day: 'numeric' };
-        const formatter = new Intl.DateTimeFormat('en-US', options);
-        const parts = formatter.formatToParts(now);
-        
-        // Extract parts to build YYYY-MM-DD manually to ensure format consistency
-        const year = parts.find(p => p.type === 'year').value;
-        const month = parts.find(p => p.type === 'month').value.padStart(2, '0');
-        const day = parts.find(p => p.type === 'day').value.padStart(2, '0');
-        
-        return `${year}-${month}-${day}`;
-    }
-
-    // --- Core Logic ---
-
-    function handleDateChange(newDateVal) {
-        if (!newDateVal) return;
-        currentViewDate = newDateVal;
+    function shiftDate(offset) {
+        let d = new Date(viewDate + 'T12:00:00');
+        d.setDate(d.getDate() + offset);
+        viewDate = d.toISOString().split('T')[0];
         render();
     }
 
-    function shiftDate(days) {
-        // Create a date object from current view string (treated as UTC to avoid timezone shifts)
-        const parts = currentViewDate.split('-');
-        const dateObj = new Date(Date.UTC(parts[0], parts[1]-1, parts[2]));
-        
-        // Add days
-        dateObj.setUTCDate(dateObj.getUTCDate() + days);
-        
-        // Convert back to YYYY-MM-DD
-        const y = dateObj.getUTCFullYear();
-        const m = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-        const d = String(dateObj.getUTCDate()).padStart(2, '0');
-        
-        currentViewDate = `${y}-${m}-${d}`;
-        render();
-    }
-
+    // --- Entry Logic ---
     function addEntry() {
-        const name = inputNameEl.value.trim();
-        const calories = parseInt(inputCalEl.value);
+        const name = document.getElementById('foodName').value;
+        const cals = parseInt(document.getElementById('foodCals').value);
+        
+        if (!name || !cals) return;
 
-        if (!name) { alert("Please enter a food type."); return; }
-        if (isNaN(calories) || calories <= 0) { alert("Please enter valid calories."); return; }
+        if (!history[viewDate]) history[viewDate] = [];
+        history[viewDate].push({ id: Date.now(), name, cals });
 
-        // Ensure array exists for this day
-        if (!historyData[currentViewDate]) {
-            historyData[currentViewDate] = [];
-        }
-
-        const entry = {
-            id: Date.now(),
-            name: name,
-            calories: calories,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-
-        historyData[currentViewDate].push(entry);
-
-        inputNameEl.value = '';
-        inputCalEl.value = '';
-        inputNameEl.focus();
-
-        saveData();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        document.getElementById('foodName').value = '';
+        document.getElementById('foodCals').value = '';
         render();
     }
 
     function deleteEntry(id) {
-        if(confirm("Delete this entry?")) {
-            const dayEntries = historyData[currentViewDate] || [];
-            historyData[currentViewDate] = dayEntries.filter(e => e.id !== id);
-            saveData();
-            render();
-        }
+        history[viewDate] = history[viewDate].filter(item => item.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        render();
     }
 
-    // --- UI Rendering ---
-
+    // --- Rendering ---
     function render() {
-        // 1. Update Date Picker UI
-        datePickerEl.value = currentViewDate;
+        document.getElementById('datePicker').value = viewDate;
+        const entries = history[viewDate] || [];
+        const total = entries.reduce((sum, item) => sum + item.cals, 0);
+        const remaining = DAILY_LIMIT - total;
 
-        // 2. Get Data for selected day
-        const dayEntries = historyData[currentViewDate] || [];
-
-        // 3. Calculate Total
-        const totalConsumed = dayEntries.reduce((sum, entry) => sum + entry.calories, 0);
-        const remaining = DAILY_LIMIT - totalConsumed;
-
-        // 4. Update Header Status
-        displayEl.innerText = remaining;
-        if (remaining < 0) {
-            displayEl.classList.add('over-limit');
-        } else {
-            displayEl.classList.remove('over-limit');
-        }
-
-        // 5. Update Log Header Text
-        const todayStr = getTodayDateString();
-        if (currentViewDate === todayStr) {
-            logHeaderEl.innerText = "Today's Log";
-        } else {
-            // Format readable date like "Oct 27, 2023"
-            const dateObj = new Date(currentViewDate + 'T12:00:00'); // append time to prevent TZ shift
-            const readable = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'});
-            logHeaderEl.innerText = `Log for ${readable}`;
-        }
-
-        // 6. Render List
-        listEl.innerHTML = '';
+        // Update Display
+        const disp = document.getElementById('calDisplay');
+        disp.innerText = remaining;
+        remaining < 0 ? disp.classList.add('over-limit') : disp.classList.remove('over-limit');
         
-        if (dayEntries.length === 0) {
-            listEl.innerHTML = `
-                <li style="justify-content:center; color:#999; padding:30px 0;">
-                    No entries for this date.
-                </li>`;
-        } else {
-            // Show newest first
-            [...dayEntries].reverse().forEach(entry => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <div class="food-info">
-                        <strong>${entry.name}</strong>
-                        <span>${entry.timestamp}</span>
-                    </div>
-                    <div style="display:flex; align-items:center;">
-                        <span class="calorie-badge">${entry.calories}</span>
-                        <button class="delete-item" onclick="deleteEntry(${entry.id})">&times;</button>
-                    </div>
-                `;
-                listEl.appendChild(li);
-            });
+        document.getElementById('logTitle').innerText = (viewDate === getTodayET()) ? "Today's Log" : `Log for ${viewDate}`;
+
+        // Update List
+        const list = document.getElementById('logList');
+        list.innerHTML = entries.map(item => `
+            <li>
+                <span><strong>${item.name}</strong> (${item.cals} cal)</span>
+                <button class="delete-item" onclick="deleteEntry(${item.id})">✕</button>
+            </li>
+        `).join('');
+
+        renderChart();
+    }
+
+    function renderChart() {
+        const chart = document.getElementById('chart');
+        chart.innerHTML = '';
+        
+        // Get last 7 days
+        for (let i = 6; i >= 0; i--) {
+            let d = new Date();
+            d.setDate(d.getDate() - i);
+            let dateStr = d.toISOString().split('T')[0];
+            
+            const dayTotal = (history[dateStr] || []).reduce((sum, item) => sum + item.cals, 0);
+            const height = Math.min((dayTotal / DAILY_LIMIT) * 80, 100); // capped for visual
+            
+            const barWrapper = document.createElement('div');
+            barWrapper.className = 'bar-wrapper';
+            barWrapper.innerHTML = `
+                <div class="bar" style="height: ${height}px; background: ${dayTotal > DAILY_LIMIT ? 'var(--danger)' : 'var(--primary)'}"></div>
+                <div class="bar-label">${dateStr.slice(8,10)}</div>
+            `;
+            chart.appendChild(barWrapper);
         }
     }
 
-    // --- Storage ---
-
-    function saveData() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(historyData));
-    }
-
-    function loadData() {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            historyData = JSON.parse(stored);
-        }
-    }
-
-    // Start
-    init();
-
+    // Startup
+    render();
 </script>
 
 </body>
