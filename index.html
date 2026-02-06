@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wiener Watch: Deluxe</title>
+    <title>Wiener Watch: Weight & Calorie Tracker</title>
     <style>
         :root {
             --primary: #008080;
@@ -12,13 +12,14 @@
             --white: #fff;
             --danger: #d32f2f;
             --gray: #f4f4f4;
+            --accent: #ff9800;
         }
 
         body {
             font-family: -apple-system, system-ui, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,7 +33,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             overflow: hidden;
             border: 2px solid var(--primary);
-            position: relative;
         }
 
         header {
@@ -46,7 +46,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             margin-top: 15px;
         }
 
@@ -55,32 +55,22 @@
             border: none;
             color: white;
             font-size: 1.2rem;
-            cursor: pointer;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        input[type="date"], input[type="text"], input[type="number"] {
-            font-size: 16px !important; 
-            background: transparent;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.4);
-            padding: 8px;
-            border-radius: 8px;
-        }
+        /* iOS NO ZOOM FIX */
+        input { font-size: 16px !important; }
 
         .status-card {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             border-bottom: 1px solid #eee;
         }
 
         .calories-big {
-            font-size: 4.5rem;
+            font-size: 4rem;
             font-weight: bold;
             color: var(--secondary);
             margin: 0;
@@ -89,98 +79,82 @@
         .over-limit { color: var(--danger); }
 
         .input-section {
-            padding: 20px;
+            padding: 15px;
             background: var(--gray);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .input-section input {
-            background: white !important;
-            color: #333 !important;
-            border: 2px solid #ddd !important;
+        .row { display: flex; gap: 8px; }
+        input[type="text"], input[type="number"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
-
-        .row { display: flex; gap: 10px; }
 
         .add-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
         }
 
-        .log-section { padding: 20px; max-height: 250px; overflow-y: auto; }
-
-        ul { list-style: none; padding: 0; margin: 0; }
-
-        li {
+        .weight-log-bar {
+            background: #fff9f0;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            border-top: 1px solid #ffe0b2;
+            border-bottom: 1px solid #ffe0b2;
+        }
+
+        .weight-display {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weight-display span { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .weight-display strong { font-size: 1.2rem; color: var(--accent); }
+
+        .log-list {
+            padding: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
 
-        .delete-btn {
-            color: #ccc;
-            background: #fdfdfd;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-
-        .delete-btn:active { background: #fee; color: red; }
-
-        /* Animation Area */
         .dog-track {
-            height: 30px;
-            background: #f9f9f9;
-            overflow: hidden;
+            height: 35px;
+            background: #fdfdfd;
             position: relative;
+            overflow: hidden;
             border-top: 1px solid #eee;
         }
 
         #runningDog {
             position: absolute;
-            font-size: 20px;
-            bottom: 2px;
-            left: -50px;
+            left: -60px;
+            font-size: 24px;
             transition: left 2s linear;
         }
 
-        .summary-section {
-            padding: 20px;
-            background: #fff;
-            border-top: 2px solid var(--secondary);
-        }
-
-        .chart-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            height: 60px;
-            margin-top: 10px;
-        }
-
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .bar { width: 12px; background: var(--primary); border-radius: 2px; transition: height 0.4s; }
-        .bar-label { font-size: 9px; color: #666; margin-top: 4px; }
-
-        .settings-link {
+        .footer {
+            padding: 15px;
+            font-size: 0.7rem;
             text-align: center;
-            padding: 10px;
-            font-size: 11px;
             color: #bbb;
-            text-decoration: underline;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -188,59 +162,59 @@
 
 <div class="app-container">
     <header>
-        <h1>🌭 Wiener Watch</h1>
+        <h1 style="margin:0">🌭 Wiener Watch</h1>
         <div class="date-nav">
             <button class="nav-btn" onclick="shiftDate(-1)">❮</button>
-            <input type="date" id="datePicker" onchange="setDate(this.value)">
+            <input type="date" id="datePicker" onchange="setDate(this.value)" style="color:black; background:white; border:none; padding:5px; border-radius:5px;">
             <button class="nav-btn" onclick="shiftDate(1)">❯</button>
         </div>
     </header>
 
     <div class="status-card">
-        <p style="margin:0; color: var(--primary); font-weight:bold; font-size: 12px;">REMAINING</p>
+        <p style="margin:0; font-size: 11px; font-weight:bold; color: var(--primary)">CALORIES REMAINING</p>
         <h2 id="calDisplay" class="calories-big">600</h2>
+    </div>
+
+    <div class="weight-log-bar">
+        <div class="weight-display">
+            <span id="weightLabel">Weight on this day</span>
+            <strong id="weightVal">-- lbs</strong>
+        </div>
+        <button onclick="updateWeight()" style="background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:6px; font-weight:bold; font-size:12px;">Log Weight</button>
     </div>
 
     <div class="input-section">
         <div class="row">
-            <input type="text" id="foodName" placeholder="Treat Type" autocomplete="off">
-            <input type="number" id="foodCals" placeholder="Cals" inputmode="decimal" pattern="[0-9]*" style="max-width: 90px;">
+            <input type="text" id="foodName" placeholder="What did he eat?" autocomplete="off">
+            <input type="number" id="foodCals" placeholder="Cals" inputmode="decimal" pattern="[0-9]*" style="max-width: 80px;">
         </div>
-        <button class="add-btn" onclick="addEntry()">Add Food</button>
+        <button class="add-btn" onclick="addEntry()">Add Treat</button>
     </div>
 
-    <div class="log-section">
-        <h3 id="logTitle" style="color: var(--secondary); margin-top:0; font-size: 1rem;">Today's Log</h3>
-        <ul id="logList"></ul>
+    <div class="log-list">
+        <h4 style="margin: 0 0 10px 0; color: var(--secondary); font-size: 0.9rem;">Daily Log</h4>
+        <ul id="listBody"></ul>
     </div>
 
     <div class="dog-track">
         <div id="runningDog">🌭🐕</div>
     </div>
 
-    <div class="summary-section">
-        <h3 style="margin:0; font-size: 0.8rem; color: var(--primary);">7-DAY TREND</h3>
-        <div class="chart-container" id="chart"></div>
+    <div class="footer">
+        <span onclick="changeGoal()" style="text-decoration:underline">Change Daily Goal</span> | 
+        <span onclick="clearEverything()" style="text-decoration:underline">Reset App</span>
     </div>
-
-    <div class="settings-link" onclick="updateLimit()">Change Daily Limit</div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'wiener_dog_v5';
-    const TZ = 'America/New_York';
+    const KEY = 'wiener_v7_final';
+    let data = JSON.parse(localStorage.getItem(KEY)) || { entries: {}, weights: {} };
+    let goal = parseInt(localStorage.getItem('w_goal')) || 600;
+    let viewDate = new Intl.DateTimeFormat('en-CA').format(new Date());
 
-    let history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-    let dailyLimit = parseInt(localStorage.getItem('wiener_limit')) || 600;
-    
-    // Default to Today on page load
-    let viewDate = getTodayET();
+    function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
 
-    function getTodayET() {
-        return new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date()); 
-    }
-
-    function setDate(val) { viewDate = val; render(); }
+    function setDate(v) { viewDate = v; render(); }
 
     function shiftDate(offset) {
         let d = new Date(viewDate + 'T12:00:00');
@@ -249,89 +223,91 @@
         render();
     }
 
-    function updateLimit() {
-        const val = prompt("Daily Goal:", dailyLimit);
-        if (val) { dailyLimit = parseInt(val); localStorage.setItem('wiener_limit', dailyLimit); render(); }
+    function updateWeight() {
+        const w = prompt("Dog's weight on " + viewDate + ":");
+        if (w && !isNaN(w)) {
+            data.weights[viewDate] = w;
+            save();
+            render();
+        }
     }
 
     function addEntry() {
-        const nInput = document.getElementById('foodName');
-        const cInput = document.getElementById('foodCals');
-        if (!nInput.value || !cInput.value) return;
+        const n = document.getElementById('foodName');
+        const c = document.getElementById('foodCals');
+        if (!n.value || !c.value) return;
 
-        if (!history[viewDate]) history[viewDate] = [];
-        history[viewDate].push({ id: Date.now().toString(), name: nInput.value, cals: parseInt(cInput.value) });
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-        nInput.value = '';
-        cInput.value = '';
+        if (!data.entries[viewDate]) data.entries[viewDate] = [];
+        data.entries[viewDate].push({ id: Date.now(), name: n.value, cals: parseInt(c.value) });
         
-        // Trigger Animation
-        const dog = document.getElementById('runningDog');
-        dog.style.left = "110%";
-        setTimeout(() => { dog.style.transition = "none"; dog.style.left = "-50px"; }, 2000);
-        setTimeout(() => { dog.style.transition = "left 2s linear"; }, 2100);
-
+        n.value = ''; c.value = '';
+        save();
+        animate();
         render();
     }
 
-    function deleteEntry(id) {
-        if (!history[viewDate]) return;
-        // Strict filter to remove specific item
-        history[viewDate] = history[viewDate].filter(item => item.id !== id);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    function deleteItem(id) {
+        data.entries[viewDate] = data.entries[viewDate].filter(i => i.id !== id);
+        save();
         render();
+    }
+
+    function animate() {
+        const dog = document.getElementById('runningDog');
+        dog.style.left = "110%";
+        setTimeout(() => { dog.style.transition = "none"; dog.style.left = "-60px"; }, 2000);
+        setTimeout(() => { dog.style.transition = "left 2s linear"; }, 2100);
+    }
+
+    // This is the core "History" logic
+    function getWeightForDate(targetDate) {
+        if (data.weights[targetDate]) return data.weights[targetDate];
+        
+        // If not found, look at all dates, sort them, and find the closest one BEFORE targetDate
+        const sortedDates = Object.keys(data.weights).sort();
+        let lastKnown = "--";
+        for (let date of sortedDates) {
+            if (date <= targetDate) {
+                lastKnown = data.weights[date];
+            } else {
+                break;
+            }
+        }
+        return lastKnown;
     }
 
     function render() {
         document.getElementById('datePicker').value = viewDate;
-        const entries = history[viewDate] || [];
-        const total = entries.reduce((sum, item) => sum + item.cals, 0);
-        const remaining = dailyLimit - total;
-
-        const disp = document.getElementById('calDisplay');
-        disp.innerText = remaining;
-        remaining < 0 ? disp.classList.add('over-limit') : disp.classList.remove('over-limit');
         
-        document.getElementById('logTitle').innerText = (viewDate === getTodayET()) ? "Today's Log" : `Log for ${viewDate}`;
+        // Calories Logic
+        const todayEntries = data.entries[viewDate] || [];
+        const total = todayEntries.reduce((s, i) => s + i.cals, 0);
+        const rem = goal - total;
+        const disp = document.getElementById('calDisplay');
+        disp.innerText = rem;
+        rem < 0 ? disp.classList.add('over-limit') : disp.classList.remove('over-limit');
 
-        const list = document.getElementById('logList');
-        // Clear and rebuild to ensure listeners/functions attach correctly
-        list.innerHTML = '';
-        if (entries.length === 0) {
-            list.innerHTML = '<li style="color:#ccc; border:none; font-size:14px;">No treats logged.</li>';
-        } else {
-            entries.forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <span><strong>${item.name}</strong> (${item.cals})</span>
-                    <button class="delete-btn" onclick="deleteEntry('${item.id}')">Delete</button>
-                `;
-                list.appendChild(li);
-            });
-        }
+        // Weight Logic
+        document.getElementById('weightVal').innerText = getWeightForDate(viewDate) + " lbs";
+        document.getElementById('weightLabel').innerText = "Weight on " + viewDate;
 
-        renderChart();
+        // List Logic
+        const list = document.getElementById('listBody');
+        list.innerHTML = todayEntries.map(i => `
+            <li>
+                <span>${i.name} <strong>(${i.cals} cal)</strong></span>
+                <button onclick="deleteItem(${i.id})" style="border:none; color:#ccc; background:none;">✕</button>
+            </li>
+        `).join('') || '<li style="color:#ccc; font-size:12px;">No treats logged for this day.</li>';
     }
 
-    function renderChart() {
-        const chart = document.getElementById('chart');
-        chart.innerHTML = '';
-        for (let i = 6; i >= 0; i--) {
-            let d = new Date();
-            d.setDate(d.getDate() - i);
-            let ds = d.toISOString().split('T')[0];
-            const dayTotal = (history[ds] || []).reduce((sum, item) => sum + item.cals, 0);
-            const height = Math.min((dayTotal / dailyLimit) * 50, 60);
-            
-            const bar = document.createElement('div');
-            bar.className = 'bar-wrapper';
-            bar.innerHTML = `
-                <div class="bar" style="height:${height}px; background:${dayTotal > dailyLimit ? 'var(--danger)':'var(--primary)'}"></div>
-                <div class="bar-label">${ds.slice(8,10)}</div>
-            `;
-            chart.appendChild(bar);
-        }
+    function changeGoal() {
+        const g = prompt("Daily Calorie Goal:", goal);
+        if (g) { goal = parseInt(g); localStorage.setItem('w_goal', goal); render(); }
+    }
+
+    function clearEverything() {
+        if(confirm("Delete all history?")) { localStorage.clear(); location.reload(); }
     }
 
     render();
