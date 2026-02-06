@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiener Watch: Deluxe Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wiener Watch: Deluxe</title>
     <style>
         :root {
-            --primary: #008080;   /* Teal */
-            --secondary: #800080; /* Purple */
+            --primary: #008080;
+            --secondary: #800080;
             --bg: #e0f2f1;
             --white: #fff;
             --danger: #d32f2f;
@@ -15,10 +15,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -58,15 +58,19 @@
             border-radius: 50%;
             width: 35px;
             height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        input[type="date"] {
+        /* iOS FIX: Font size must be 16px or larger to prevent auto-zoom */
+        input[type="date"], input[type="text"], input[type="number"] {
+            font-size: 16px !important; 
             background: transparent;
             color: white;
             border: 1px solid rgba(255,255,255,0.4);
-            padding: 5px;
-            border-radius: 5px;
-            font-weight: bold;
+            padding: 8px;
+            border-radius: 8px;
         }
 
         .status-card {
@@ -92,33 +96,34 @@
             gap: 10px;
         }
 
-        .row { display: flex; gap: 10px; }
-
-        input[type="text"], input[type="number"] {
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            flex: 1;
+        .input-section input {
+            background: white !important;
+            color: #333 !important;
+            border: 2px solid #ddd !important;
         }
+
+        .row { display: flex; gap: 10px; }
 
         .add-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 15px;
             border-radius: 8px;
             font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
         }
 
-        .log-section { padding: 20px; max-height: 300px; overflow-y: auto; }
+        .log-section { padding: 20px; max-height: 250px; overflow-y: auto; }
 
         ul { list-style: none; padding: 0; margin: 0; }
 
         li {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            align-items: center;
+            padding: 12px 0;
             border-bottom: 1px solid #eee;
         }
 
@@ -126,13 +131,11 @@
             color: #ccc;
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             cursor: pointer;
+            padding: 0 10px;
         }
 
-        .delete-item:hover { color: var(--danger); }
-
-        /* Summary Chart Styling */
         .summary-section {
             padding: 20px;
             background: #fff;
@@ -143,33 +146,21 @@
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
-            height: 100px;
+            height: 80px;
             margin-top: 15px;
-            padding-top: 20px;
         }
 
-        .bar-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-        }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .bar { width: 15px; background: var(--primary); border-radius: 3px 3px 0 0; transition: height 0.4s; }
+        .bar-label { font-size: 10px; color: #666; margin-top: 5px; }
 
-        .bar {
-            width: 20px;
-            background: var(--primary);
-            border-radius: 3px 3px 0 0;
-            transition: height 0.5s ease;
-        }
-
-        .bar-label { font-size: 0.7rem; color: #666; margin-top: 5px; }
-        
-        .limit-line {
-            border-top: 1px dashed var(--danger);
-            width: 100%;
-            position: relative;
-            height: 0;
-            top: -60px; /* Simulated 600 line */
+        .settings-link {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #999;
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -186,46 +177,44 @@
     </header>
 
     <div class="status-card">
-        <p style="margin:0; color: var(--primary); font-weight:bold;">REMAINING</p>
+        <p style="margin:0; color: var(--primary); font-weight:bold; letter-spacing:1px;">REMAINING</p>
         <h2 id="calDisplay" class="calories-big">600</h2>
     </div>
 
     <div class="input-section">
         <div class="row">
-            <input type="text" id="foodName" placeholder="Treat Type (e.g. Cheese)">
-            <input type="number" id="foodCals" placeholder="Cals" style="max-width: 80px;">
+            <input type="text" id="foodName" placeholder="Treat Type" autocomplete="off">
+            <input type="number" id="foodCals" placeholder="Cals" style="max-width: 90px;">
         </div>
         <button class="add-btn" onclick="addEntry()">Add Food</button>
     </div>
 
     <div class="log-section">
-        <h3 id="logTitle" style="color: var(--secondary); margin-top:0;">Today's Log</h3>
+        <h3 id="logTitle" style="color: var(--secondary); margin-top:0; font-size: 1.1rem;">Today's Log</h3>
         <ul id="logList"></ul>
     </div>
 
     <div class="summary-section">
-        <h3 style="margin:0; font-size: 1rem; color: var(--primary);">7-Day Trend</h3>
+        <h3 style="margin:0; font-size: 0.9rem; color: var(--primary); text-transform: uppercase;">7-Day Trend</h3>
         <div class="chart-container" id="chart"></div>
     </div>
+
+    <div class="settings-link" onclick="updateLimit()">Change Daily Goal</div>
 </div>
 
 <script>
-    const DAILY_LIMIT = 600;
-    const STORAGE_KEY = 'wiener_dog_v3_data';
+    const STORAGE_KEY = 'wiener_dog_v4_data';
     const TZ = 'America/New_York';
 
     let history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    let dailyLimit = parseInt(localStorage.getItem('wiener_limit')) || 600;
     let viewDate = getTodayET();
 
-    // --- Date Logic ---
     function getTodayET() {
         return new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date()); 
     }
 
-    function setDate(val) {
-        viewDate = val;
-        render();
-    }
+    function setDate(val) { viewDate = val; render(); }
 
     function shiftDate(offset) {
         let d = new Date(viewDate + 'T12:00:00');
@@ -234,10 +223,20 @@
         render();
     }
 
-    // --- Entry Logic ---
+    function updateLimit() {
+        const newLimit = prompt("Enter new daily calorie goal:", dailyLimit);
+        if (newLimit && !isNaN(newLimit)) {
+            dailyLimit = parseInt(newLimit);
+            localStorage.setItem('wiener_limit', dailyLimit);
+            render();
+        }
+    }
+
     function addEntry() {
-        const name = document.getElementById('foodName').value;
-        const cals = parseInt(document.getElementById('foodCals').value);
+        const nameInput = document.getElementById('foodName');
+        const calInput = document.getElementById('foodCals');
+        const name = nameInput.value;
+        const cals = parseInt(calInput.value);
         
         if (!name || !cals) return;
 
@@ -245,39 +244,37 @@
         history[viewDate].push({ id: Date.now(), name, cals });
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-        document.getElementById('foodName').value = '';
-        document.getElementById('foodCals').value = '';
+        nameInput.value = '';
+        calInput.value = '';
         render();
     }
 
     function deleteEntry(id) {
+        if(!confirm("Delete this?")) return;
         history[viewDate] = history[viewDate].filter(item => item.id !== id);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
         render();
     }
 
-    // --- Rendering ---
     function render() {
         document.getElementById('datePicker').value = viewDate;
         const entries = history[viewDate] || [];
         const total = entries.reduce((sum, item) => sum + item.cals, 0);
-        const remaining = DAILY_LIMIT - total;
+        const remaining = dailyLimit - total;
 
-        // Update Display
         const disp = document.getElementById('calDisplay');
         disp.innerText = remaining;
         remaining < 0 ? disp.classList.add('over-limit') : disp.classList.remove('over-limit');
         
         document.getElementById('logTitle').innerText = (viewDate === getTodayET()) ? "Today's Log" : `Log for ${viewDate}`;
 
-        // Update List
         const list = document.getElementById('logList');
-        list.innerHTML = entries.map(item => `
+        list.innerHTML = entries.length ? entries.map(item => `
             <li>
                 <span><strong>${item.name}</strong> (${item.cals} cal)</span>
                 <button class="delete-item" onclick="deleteEntry(${item.id})">✕</button>
             </li>
-        `).join('');
+        `).join('') : '<li style="color:#ccc; border:none;">No entries yet.</li>';
 
         renderChart();
     }
@@ -285,29 +282,24 @@
     function renderChart() {
         const chart = document.getElementById('chart');
         chart.innerHTML = '';
-        
-        // Get last 7 days
         for (let i = 6; i >= 0; i--) {
             let d = new Date();
             d.setDate(d.getDate() - i);
             let dateStr = d.toISOString().split('T')[0];
-            
             const dayTotal = (history[dateStr] || []).reduce((sum, item) => sum + item.cals, 0);
-            const height = Math.min((dayTotal / DAILY_LIMIT) * 80, 100); // capped for visual
+            const height = Math.min((dayTotal / dailyLimit) * 60, 80);
             
             const barWrapper = document.createElement('div');
             barWrapper.className = 'bar-wrapper';
             barWrapper.innerHTML = `
-                <div class="bar" style="height: ${height}px; background: ${dayTotal > DAILY_LIMIT ? 'var(--danger)' : 'var(--primary)'}"></div>
+                <div class="bar" style="height: ${height}px; background: ${dayTotal > dailyLimit ? 'var(--danger)' : 'var(--primary)'}"></div>
                 <div class="bar-label">${dateStr.slice(8,10)}</div>
             `;
             chart.appendChild(barWrapper);
         }
     }
 
-    // Startup
     render();
 </script>
-
 </body>
 </html>
